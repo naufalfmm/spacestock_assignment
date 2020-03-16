@@ -44,9 +44,9 @@ func createWhereQuery(filter map[string]string, fromDate string, toDate string) 
 			err := errors.New("created_at not accepted")
 
 			return "", err
-		} else {
-			whereQuery = whereQuery + field + " LIKE '%" + value + "%'"
 		}
+
+		whereQuery = whereQuery + field + " LIKE '%" + value + "%'"
 	}
 
 	if fromDate != "" || toDate != "" {
@@ -77,7 +77,12 @@ func (ar *apartmentRepository) GetAll(filter map[string]string, order map[string
 	fetchDb := ar.Conn.Where(whereQuery)
 
 	if order != nil {
-		fetchDb = fetchDb.Order(order["field"] + " " + order["type"])
+		orderedField, exist := order["field"]
+		if !exist {
+			return data, errors.New("Ordered field must be exist")
+		}
+
+		fetchDb = fetchDb.Order(orderedField + " " + order["type"])
 	}
 
 	if limit != 0 {
