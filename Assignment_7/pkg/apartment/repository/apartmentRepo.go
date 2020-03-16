@@ -20,18 +20,6 @@ func NewPostgresqlApartmentRepository(Connection *gorm.DB) apartment.Repository 
 	return &apartmentRepository{Conn: Connection}
 }
 
-// GetByID --> get by id
-func (ar *apartmentRepository) GetByID(id int) (models.Apartment, error) {
-	var data models.Apartment
-
-	fetchDb := ar.Conn.Where("id = ?", id).Preload("Units").Preload("Developer").First(&data)
-	if fetchDb.Error != nil {
-		return data, fetchDb.Error
-	}
-
-	return data, nil
-}
-
 func createWhereQuery(filter map[string]string, fromDate string, toDate string) (string, error) {
 	whereQuery := ""
 
@@ -64,6 +52,18 @@ func createWhereQuery(filter map[string]string, fromDate string, toDate string) 
 	}
 
 	return whereQuery, nil
+}
+
+// GetByID --> get by id
+func (ar *apartmentRepository) GetByID(id int) (models.Apartment, error) {
+	var data models.Apartment
+
+	fetchDb := ar.Conn.Where("id = ?", id).Preload("Units").Preload("Developer").First(&data)
+	if fetchDb.Error != nil {
+		return data, fetchDb.Error
+	}
+
+	return data, nil
 }
 
 func (ar *apartmentRepository) GetAll(filter map[string]string, order map[string]string, limit int, fromDate string, toDate string) ([]models.Apartment, error) {
